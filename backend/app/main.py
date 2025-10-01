@@ -75,6 +75,13 @@ def get_users(
         raise HTTPException(status_code=403, detail="Acesso negado")
     return database.get_all_users(db)
 
+@app.get("/vendedores/", response_model=List[schemas.UserResponse])
+def get_vendedores(
+    db: Session = Depends(get_db),
+    current_user: schemas.UserResponse = Depends(auth.get_current_user)
+):
+    return database.get_vendedores(db)
+
 @app.post("/seed")
 def seed_database(db: Session = Depends(get_db)):
     return auth.seed_database(db)

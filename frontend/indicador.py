@@ -21,10 +21,9 @@ def show_novo_lead():
         city_state = st.text_input("Cidade/Estado *")
         observation = st.text_area("Observação")
         
-        response = make_authenticated_request("/users/")
+        response = make_authenticated_request("/vendedores/")
         if response and response.status_code == 200:
-            users = response.json()
-            vendedores = [u for u in users if u['role'] == 'vendedor']
+            vendedores = response.json()
             vendedor_options = {f"{v['name']} (ID: {v['id']})": v['id'] for v in vendedores}
             
             vendedor_selecionado = st.selectbox(

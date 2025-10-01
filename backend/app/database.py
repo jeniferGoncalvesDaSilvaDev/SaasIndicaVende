@@ -44,5 +44,8 @@ def update_lead_status(db: Session, lead_id: int, lead_update: schemas.LeadUpdat
 def get_all_users(db: Session):
     return db.query(models.User).all()
 
+def get_vendedores(db: Session):
+    return db.query(models.User).filter(models.User.role == models.UserRole.VENDEDOR).all()
+
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
