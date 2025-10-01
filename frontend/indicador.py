@@ -15,41 +15,48 @@ def show_indicador_interface():
 def show_novo_lead():
     st.header("📋 Novo Lead")
     
+    response = make_authenticated_request("/vendedores/")
+    if not response or response.status_code != 200:
+        st.error("Erro ao carregar lista de vendedores. Por favor, recarregue a página.")
+        return
+    
+    vendedores = response.json()
+    if not vendedores:
+        st.warning("Nenhum vendedor disponível no momento.")
+        return
+    
+    vendedor_options = {f"{v['name']} (ID: {v['id']})": v['id'] for v in vendedores}
+    
     with st.form("novo_lead_form"):
         client_name = st.text_input("Nome do Cliente *")
         phone = st.text_input("Telefone/WhatsApp *")
         city_state = st.text_input("Cidade/Estado *")
         observation = st.text_area("Observação")
         
-        response = make_authenticated_request("/vendedores/")
-        if response and response.status_code == 200:
-            vendedores = response.json()
-            vendedor_options = {f"{v['name']} (ID: {v['id']})": v['id'] for v in vendedores}
-            
-            vendedor_selecionado = st.selectbox(
-                "Selecionar Vendedor *",
-                options=list(vendedor_options.keys())
-            )
-            
-            submit = st.form_submit_button("Enviar Indicação")
-            
-            if submit:
-                if not all([client_name, phone, city_state]):
-                    st.error("Preencha todos os campos obrigatórios (*)")
+        vendedor_selecionado = st.selectbox(
+            "Selecionar Vendedor *",
+            options=list(vendedor_options.keys())
+        )
+        
+        submit = st.form_submit_button("Enviar Indicação")
+        
+        if submit:
+            if not all([client_name, phone, city_state]):
+                st.error("Preencha todos os campos obrigatórios (*)")
+            else:
+                lead_data = {
+                    "client_name": client_name,
+                    "phone": phone,
+                    "city_state": city_state,
+                    "observation": observation,
+                    "vendedor_id": vendedor_options[vendedor_selecionado]
+                }
+                
+                response = make_authenticated_request("/leads/", "POST", lead_data)
+                if response and response.status_code == 200:
+                    st.success("Lead enviado com sucesso!")
                 else:
-                    lead_data = {
-                        "client_name": client_name,
-                        "phone": phone,
-                        "city_state": city_state,
-                        "observation": observation,
-                        "vendedor_id": vendedor_options[vendedor_selecionado]
-                    }
-                    
-                    response = make_authenticated_request("/leads/", "POST", lead_data)
-                    if response and response.status_code == 200:
-                        st.success("Lead enviado com sucesso!")
-                    else:
-                        st.error("Erro ao enviar lead")
+                    st.error("Erro ao enviar lead")
 
 def show_meus_leads():
     st.header("📊 Meus Leads")
