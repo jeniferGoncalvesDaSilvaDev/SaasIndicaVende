@@ -36,7 +36,7 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.refresh(db_user)
     return db_user
 
-def get_current_user(db: Session = Depends(database.SessionLocal), user_email: Optional[str] = Header(None, alias="X-User-Email")):
+def get_current_user(db: Session = Depends(database.get_db), user_email: Optional[str] = Header(None, alias="X-User-Email")):
     if not user_email:
         raise HTTPException(status_code=401, detail="Authentication required")
     

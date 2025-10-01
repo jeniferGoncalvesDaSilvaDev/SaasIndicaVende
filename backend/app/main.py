@@ -5,7 +5,7 @@ from typing import List
 import uvicorn
 
 from . import models, schemas, auth, database
-from .database import SessionLocal, engine
+from .database import engine, get_db
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -18,13 +18,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @app.post("/auth/login", response_model=schemas.UserResponse)
 def login(credentials: schemas.LoginRequest, db: Session = Depends(get_db)):

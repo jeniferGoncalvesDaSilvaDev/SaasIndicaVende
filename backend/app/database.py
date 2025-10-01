@@ -10,6 +10,13 @@ SQLALCHEMY_DATABASE_URL = "sqlite:///./indicavende.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 def create_lead(db: Session, lead: schemas.LeadCreate, indicador_id: int):
     db_lead = models.Lead(
         **lead.dict(),
