@@ -76,7 +76,7 @@ def show_gestor_dashboard():
                 ic_superior = media + margem_erro
 
             # Exibir métricas em cards
-            col1, col2, col3, col4 = st.columns(4)
+            col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
                 st.metric("📊 Média de Leads/Dia", f"{media:.2f}")
             with col2:
@@ -85,6 +85,20 @@ def show_gestor_dashboard():
                 st.metric("🎯 Moda", f"{moda:.0f}")
             with col4:
                 st.metric("📈 Amplitude", f"{minimo:.0f} - {maximo:.0f}")
+            with col5:
+                st.metric("📊 Desvio Padrão", f"{desvio_padrao:.2f}")
+
+            # Incluir explicações didáticas
+            st.markdown(f"""
+            ### 📊 Explicação das Estatísticas
+            - **Média**: A média dos leads por dia é {media:.2f}. Isto representa o número médio de leads gerados diariamente.
+            - **Mediana**: A mediana é {mediana:.1f}, que é o valor que divide os dias em duas metades. Se um dia teve muitos leads, a mediana pode ser mais representativa que a média.
+            - **Moda**: A moda é {moda:.0f}, que representa o número mais frequente de leads gerados em um dia. Este número ajuda a entender qual é o cenário mais comum na geração de leads.
+            - **Amplitude**: A amplitude dos leads varia entre {minimo:.0f} e {maximo:.0f}. Isso indica a diferença entre o menor e o maior número de leads gerados no período.
+            - **Desvio Padrão**: O desvio padrão é {desvio_padrao:.2f}. Valores mais altos indicam que os dados estão mais espalhados em relação à média, enquanto valores baixos significam que estão próximos à média.
+
+            Este conjunto de estatísticas ajuda a entender melhor a performance dos leads, permitindo estratégias mais informadas.
+            """)
 
             # Gerar o histograma
             st.subheader("📊 Histograma de Leads")
@@ -99,18 +113,6 @@ def show_gestor_dashboard():
             st.subheader("📥 Download dos Dados de Leads")
             csv = df_leads.to_csv(index=False)
             st.download_button("Baixar Dados como CSV", csv, "leads.csv", "text/csv")
-
-            # Explicação sobre assimetria e curtose
-            st.markdown("""
-            ### 📊 Explicação do Histograma
-            O histograma acima mostra a distribuição dos leads ao longo do tempo. A forma do histograma pode nos dar insights sobre a performance dos leads. Vejamos algumas definições:
-
-            - **Assimetria (Skewness)**: Mede a simetria da distribuição. Uma assimetria positiva indica que a cauda da distribuição é mais longa à direita, enquanto uma assimetria negativa indica que a cauda é mais longa à esquerda.
-
-            - **Curtose (Kurtosis)**: Mede a "altura" e "largura" das distribuições. Uma curtose alta indica picos altos e caudas largas, enquanto uma curtose baixa indica picos mais baixos e caudas mais curtas.
-
-            A análise desses elementos é essencial para entender melhor a natureza dos seus dados.
-            """)
 
         else:
             st.info("📊 Dados insuficientes para calcular estatísticas descritivas. Aguarde mais leads serem cadastrados.")
