@@ -60,6 +60,24 @@ mode = "sequential"
 task = "shell.exec"
 args = "cd frontend && BACKEND_URL=http://localhost:8000 streamlit run app.py --server.port 5000 --server.address 0.0.0.0 --server.headless true"
 
+[[workflows.workflow]]
+name = "Start Backend"
+author = 48193209
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd backend && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+[[workflows.workflow]]
+name = "Start Frontend"
+author = 48193209
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd frontend && BACKEND_URL=http://localhost:8000 streamlit run app.py --server.port 5000 --server.address 0.0.0.0 --server.headless true"
+
 [[ports]]
 localPort = 5000
 externalPort = 80
