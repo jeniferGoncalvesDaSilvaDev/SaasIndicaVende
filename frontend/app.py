@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 import json
-from auth import login, logout, get_current_user
+from auth import login, logout, get_current_user, register
 from indicador import show_indicador_interface
 from vendedor import show_vendedor_interface
 from gestor import show_gestor_interface
@@ -39,13 +39,18 @@ st.markdown("""
 def main():
     if 'user' not in st.session_state:
         st.session_state.user = None
+    if 'show_register' not in st.session_state:
+        st.session_state.show_register = False
     
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.markdown('<div class="main-header">🚀 IndicaVende</div>', unsafe_allow_html=True)
     
     if not st.session_state.user:
-        show_login_screen()
+        if st.session_state.show_register:
+            show_register_screen()
+        else:
+            show_login_screen()
     else:
         show_main_interface()
 
@@ -68,6 +73,49 @@ def show_login_screen():
                     st.rerun()
                 else:
                     st.error("Credenciais inválidas")
+        
+        st.markdown("---")
+        if st.button("Não tem conta? Criar conta"):
+            st.session_state.show_register = True
+            st.rerun()
+
+def show_register_screen():
+    st.markdown("---")
+    col1, col2, col3 = st.columns([1, 2, 1])
+    
+    with col2:
+        st.subheader("Criar Conta")
+        
+        with st.form("register_form"):
+            name = st.text_input("Nome *")
+            email = st.text_input("Email *")
+            password = st.text_input("Senha *", type="password")
+            role = st.selectbox(
+                "Perfil *",
+                options=["vendedor", "indicador", "gestor"],
+                format_func=lambda x: {
+                    "vendedor": "Vendedor",
+                    "indicador": "Indicador",
+                    "gestor": "Gestor"
+                }[x]
+            )
+            
+            submit = st.form_submit_button("Criar Conta")
+            
+            if submit:
+                if not all([name, email, password]):
+                    st.error("Preencha todos os campos obrigatórios (*)")
+                else:
+                    user = register(name, email, password, role)
+                    if user:
+                        st.success("Conta criada com sucesso! Faça login para continuar.")
+                        st.session_state.show_register = False
+                        st.rerun()
+        
+        st.markdown("---")
+        if st.button("Já tem conta? Fazer login"):
+            st.session_state.show_register = False
+            st.rerun()
 
 def show_main_interface():
     user = st.session_state.user

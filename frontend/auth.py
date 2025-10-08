@@ -18,6 +18,27 @@ def login(email: str, password: str):
         st.error(f"Erro ao conectar com o servidor: {e}")
         return None
 
+def register(name: str, email: str, password: str, role: str):
+    try:
+        response = requests.post(f"{BASE_URL}/auth/register", json={
+            "name": name,
+            "email": email,
+            "password": password,
+            "role": role
+        })
+        
+        if response.status_code == 200:
+            return response.json()
+        elif response.status_code == 400:
+            st.error("Email já está cadastrado")
+            return None
+        else:
+            st.error(f"Erro ao criar conta: {response.text}")
+            return None
+    except Exception as e:
+        st.error(f"Erro ao conectar com o servidor: {e}")
+        return None
+
 def logout():
     st.session_state.user = None
 
