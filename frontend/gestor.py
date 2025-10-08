@@ -56,7 +56,7 @@ def show_gestor_dashboard():
         # Preparar dados numéricos para análise
         # Converter leads para série temporal (leads por dia)
         df_leads = pd.DataFrame(leads)
-        df_leads['data'] = pd.to_datetime(df_leads['created_at']).dt.date
+        df_leads['data'] = pd.to_datetime(df_leads['created_at'], format='ISO8601').dt.date
         leads_por_dia_series = df_leads.groupby('data').size()
         
         if len(leads_por_dia_series) > 0:
@@ -241,7 +241,7 @@ def show_gestor_dashboard():
         # Gráfico de leads por dia (últimos 30 dias)
         if leads_recentes:
             df_temporal = pd.DataFrame(leads_recentes)
-            df_temporal['data'] = pd.to_datetime(df_temporal['created_at']).dt.date
+            df_temporal['data'] = pd.to_datetime(df_temporal['created_at'], format='ISO8601').dt.date
             leads_por_dia = df_temporal.groupby('data').size().reset_index(name='Quantidade')
             st.line_chart(leads_por_dia.set_index('data'))
         
